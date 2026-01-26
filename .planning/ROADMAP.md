@@ -30,8 +30,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 2 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Foundation modules (Task model, week utilities, storage layer)
-- [ ] 01-02-PLAN.md — Integration testing and verification
+- [x] 01-01-PLAN.md — Foundation modules (Task model, week utilities, storage layer)
+- [x] 01-02-PLAN.md — Integration testing and verification
 
 ### Phase 2: CLI Operations
 **Goal**: Provide complete command-line interface for managing weekly tasks
@@ -44,10 +44,10 @@ Plans:
   4. User can delete tasks via `python todo.py delete <id>`
   5. Invalid commands show usage help
   6. Invalid task IDs show clear error messages
-**Plans**: TBD
+**Plans**: 1 plan
 
 Plans:
-- [ ] (Plans to be created during plan-phase)
+- [ ] 02-01-PLAN.md — CLI interface with add, list, complete, delete commands
 
 ## Progress
 
@@ -57,8 +57,8 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Storage & Task Model | 2/2 | Complete | 2026-01-26 |
-| 2. CLI Operations | 0/? | Not started | - |
+| 2. CLI Operations | 0/1 | Ready to execute | - |
 
 ---
 *Roadmap created: 2026-01-26*
-*Last updated: 2026-01-26 after Phase 1 completion*
+*Last updated: 2026-01-26 after Phase 2 planning*
