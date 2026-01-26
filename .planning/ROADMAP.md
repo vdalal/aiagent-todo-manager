@@ -27,10 +27,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. File read errors are caught and reported with clear messages
   4. File write errors are caught and reported with clear messages
   5. Task data can be loaded from the JSON file on subsequent runs
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] (Plans to be created during plan-phase)
+- [ ] 01-01-PLAN.md — Foundation modules (Task model, week utilities, storage layer)
+- [ ] 01-02-PLAN.md — Integration testing and verification
 
 ### Phase 2: CLI Operations
 **Goal**: Provide complete command-line interface for managing weekly tasks
@@ -55,9 +56,9 @@ Phases execute in numeric order: 1 → 2
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Core Storage & Task Model | 0/? | Not started | - |
+| 1. Core Storage & Task Model | 0/2 | Ready to execute | - |
 | 2. CLI Operations | 0/? | Not started | - |
 
 ---
 *Roadmap created: 2026-01-26*
-*Last updated: 2026-01-26 after initial creation*
+*Last updated: 2026-01-26 after Phase 1 planning*
