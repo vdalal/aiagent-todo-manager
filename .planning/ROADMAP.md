@@ -13,7 +13,7 @@ This roadmap delivers a command-line TODO manager in two phases. Phase 1 establi
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Core Storage & Task Model** - JSON persistence and week-based task structure
-- [ ] **Phase 2: CLI Operations** - Command interface for add, list, complete, delete
+- [x] **Phase 2: CLI Operations** - Command interface for add, list, complete, delete
 
 ## Phase Details
 
@@ -47,7 +47,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 02-01-PLAN.md — CLI interface with add, list, complete, delete commands
+- [x] 02-01-PLAN.md — CLI interface with add, list, complete, delete commands
 
 ## Progress
 
@@ -57,8 +57,8 @@ Phases execute in numeric order: 1 → 2
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Core Storage & Task Model | 2/2 | Complete | 2026-01-26 |
-| 2. CLI Operations | 0/1 | Ready to execute | - |
+| 2. CLI Operations | 1/1 | Complete | 2026-01-26 |
 
 ---
 *Roadmap created: 2026-01-26*
-*Last updated: 2026-01-26 after Phase 2 planning*
+*Last updated: 2026-01-26 after Phase 2 execution*
