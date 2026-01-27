@@ -12,20 +12,20 @@ Users can quickly manage their weekly tasks from the command line without any ex
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ User can add new tasks to the current week — v1.0
+- ✓ User can list all tasks for the current week — v1.0
+- ✓ User can mark tasks as complete (shown crossed off with ~~text~~) — v1.0
+- ✓ User can delete tasks by ID — v1.0
+- ✓ Tasks are stored in a JSON file — v1.0
+- ✓ Tasks have auto-generated IDs (UUID-based) — v1.0
+- ✓ Week starts on Monday — v1.0
+- ✓ Invalid commands show usage help — v1.0
+- ✓ Invalid task IDs show error message — v1.0
+- ✓ File read/write errors are caught and reported — v1.0
 
 ### Active
 
-- [ ] User can add new tasks to the current week
-- [ ] User can list all tasks for the current week
-- [ ] User can mark tasks as complete (shown crossed off)
-- [ ] User can delete tasks by ID
-- [ ] Tasks are stored in a JSON file
-- [ ] Tasks have auto-generated IDs
-- [ ] Week starts on Monday
-- [ ] Invalid commands show usage help
-- [ ] Invalid task IDs show error message
-- [ ] File read/write errors are caught and reported
+(None — v1.0 complete. Define new requirements for next milestone.)
 
 ### Out of Scope
 
@@ -38,6 +38,13 @@ Users can quickly manage their weekly tasks from the command line without any ex
 
 ## Context
 
+**Current State (v1.0 shipped 2026-01-26):**
+- 616 lines of Python across 5 modules
+- Tech stack: Python 3.x with standard library only (uuid, datetime, json, argparse)
+- All 15 v1 requirements validated through integration tests and human verification
+- Zero known issues or technical debt
+
+**History:**
 This is a learning project to explore GSD workflow. The focus is on simplicity and reliability - a straightforward CLI tool that does one thing well: manage this week's tasks.
 
 ## Constraints
@@ -51,10 +58,14 @@ This is a learning project to explore GSD workflow. The focus is on simplicity a
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Week-based organization | Tasks naturally fit into weekly cycles | — Pending |
-| Auto-generated IDs | More reliable than text matching for operations | — Pending |
-| Show completed tasks crossed off | Users can see what they've accomplished this week | — Pending |
-| Python standard library only | Zero setup, maximum portability | — Pending |
+| Week-based organization | Tasks naturally fit into weekly cycles | ✓ Good (v1.0) |
+| UUID-based task IDs | More reliable than sequential numbers, no collision risk | ✓ Good (v1.0) |
+| Show completed tasks crossed off | Users can see what they've accomplished this week | ✓ Good (v1.0 - ~~text~~ format) |
+| Python standard library only | Zero setup, maximum portability | ✓ Good (v1.0 - achieved) |
+| Monday-Sunday week boundaries | Aligns with ISO 8601 week definition | ✓ Good (v1.0) |
+| JSON wrapper object structure | Allows future extension with metadata | ✓ Good (v1.0 - extensible) |
+| Argparse with subparsers | Clean command structure with auto help | ✓ Good (v1.0) |
+| Error handling returns empty list | FileNotFoundError is normal on first run | ✓ Good (v1.0) |
 
 ---
-*Last updated: 2026-01-26 after initialization*
+*Last updated: 2026-01-26 after v1.0 milestone*
