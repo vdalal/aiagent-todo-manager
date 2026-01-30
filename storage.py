@@ -61,13 +61,26 @@ class TaskStore:
             print(f"Error: Cannot write to {self.filepath} - check permissions")
             raise
 
+
     def add_task(self, task):
         """Add a new task to storage.
+
+        Auto-assigns the next integer ID.
 
         Args:
             task: Task object to add
         """
         tasks = self.load_tasks()
+        
+        # Auto-increment ID
+        if not tasks:
+            next_id = 1
+        else:
+            # Find max existing ID (handles potentially unsorted lists)
+            max_id = max(t.id for t in tasks)
+            next_id = max_id + 1
+        
+        task.id = next_id
         tasks.append(task)
         self.save_tasks(tasks)
 
@@ -82,3 +95,16 @@ class TaskStore:
         """
         tasks = self.load_tasks()
         return [task for task in tasks if task.week_start == week_start]
+
+    def get_task_count_by_category(self, week_start, category):
+        """Count tasks in a specific category for a given week.
+        
+        Args:
+            week_start: ISO date string for Monday of the week
+            category: Category string to count
+            
+        Returns:
+            int: Number of tasks
+        """
+        tasks = self.get_tasks_for_week(week_start)
+        return sum(1 for t in tasks if t.category == category)
