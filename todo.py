@@ -1,8 +1,11 @@
 import argparse
 import sys
+
+from datetime import datetime
 from task import Task, VALID_CATEGORIES, CAT_IMPORTANT_URGENT, CAT_URGENT, CAT_IMPORTANT
 from storage import TaskStore
 from week_utils import get_week_start
+
 
 # Priority mapping (Lower is higher priority)
 PRIORITY_MAP = {
@@ -55,6 +58,11 @@ def list_tasks(args, store):
         store: TaskStore instance
     """
     try:
+        # Print Date Header
+        now = datetime.now()
+        date_str = now.strftime("%m:%d:%Y %A")
+        print(f"\n📅 {date_str}")
+
         current_week = get_week_start()
         tasks = store.get_tasks_for_week(current_week)
 
