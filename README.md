@@ -1,212 +1,109 @@
-\# AI Agent TODO Manager
+# AI Agent TODO Manager
 
+A week-based command-line TODO list manager built using AI Agent-assisted development. Now features the **Eisenhower Matrix** for productivity!
 
+## Features
 
-A week-based command-line TODO list manager built using AI Agent-assisted development with GSD (Get-Shit-Done) and Claude Code.
+- 📅 **Week-based organization**: Tasks automatically organized by Monday-Sunday weeks
+- 🧠 **Eisenhower Matrix**: Categorize tasks by Priority:
+    - **Important & Urgent** (Priority 1)
+    - **Urgent** (Priority 2)
+    - **Important** (Priority 3)
+- 🔢 **Simple IDs**: Easy-to-type integer IDs (1, 2, 3...)
+- 🚫 **Task Limits**: Strict limit of **3 tasks** per category to enforce focus
+- ⚡ **Bulk Actions**: Complete or delete all tasks for the week in one command
+- 💾 **Zero dependencies**: Pure Python standard library
+- 💾 **JSON persistence**: Tasks saved to local file (`tasks.json`)
 
-
-
-\## Features
-
-
-
-\- 📅 \*\*Week-based organization\*\*: Tasks automatically organized by Monday-Sunday weeks
-
-\- 💾 \*\*Zero dependencies\*\*: Pure Python standard library
-
-\- ✅ \*\*Complete/uncomplete tasks\*\*: Visual strikethrough for completed items
-
-\- 🗑️ \*\*Delete tasks\*\*: Remove tasks you no longer need
-
-\- 🆔 \*\*UUID-based IDs\*\*: Unique, collision-free task identifiers
-
-\- 💾 \*\*JSON persistence\*\*: Tasks saved to local file
-
-
-
-\## Installation
+## Installation
 
 ```bash
-
-git clone https://github.com/YOUR\_USERNAME/aiagent-todo-manager.git
-
+git clone https://github.com/vdalal/aiagent-todo-manager.git
 cd aiagent-todo-manager
-
 ```
-
-
 
 No dependencies to install - pure Python!
 
-
-
-\## Usage
+## Usage
 
 ```bash
+# Add a task (Default category: Important & Urgent)
+py todo.py add "Fix server"
 
-\# Add a task
+# Add a task to specific category
+py todo.py add "Buy milk" -c urgent
+py todo.py add "Learn Python" -c important
 
-py todo.py add "Buy groceries"
-
-
-
-\# List all tasks for current week
-
+# List all tasks (Sorted by Priority: Imp+Urg -> Urgent -> Imp)
 py todo.py list
 
+# Complete a task
+py todo.py complete <id>
 
+# Delete a task
+py todo.py delete <id>
 
-\# Complete a task
+# BULK ACTIONS
+# Complete ALL tasks for the current week
+py todo.py complete-all
 
-py todo.py complete <task-id>
+# Delete ALL tasks for the current week
+py todo.py delete-all
 
-
-
-\# Delete a task
-
-py todo.py delete <task-id>
-
-
-
-\# Show help
-
+# Show help
 py todo.py --help
-
 ```
 
+### Valid Categories
+- `important_urgent` (Default)
+- `urgent`
+- `important`
 
-
-\## Example
+## Example
 
 ```bash
+$ py todo.py add "Fix critical bug" -c important_urgent
+Added task: Fix critical bug (ID: 1) -> Important & Urgent
 
-$ py todo.py add "Buy groceries"
-
-Added task: Buy groceries (ID: 349cef9e-bc25-4a16-9d62-ba31317ff8cb)
-
-
-
-$ py todo.py add "Write report"
-
-Added task: Write report (ID: b0e6272d-0d9c-432a-88aa-ac277b511308)
-
-
+$ py todo.py add "Email boss" -c urgent
+Added task: Email boss (ID: 2) -> Urgent (Not Important)
 
 $ py todo.py list
 
-\[349cef9e-bc25-4a16-9d62-ba31317ff8cb] Buy groceries
+--- Important & Urgent ---
+[1] Fix critical bug
 
-\[b0e6272d-0d9c-432a-88aa-ac277b511308] Write report
+--- Urgent (Not Important) ---
+[2] Email boss
 
-
-
-$ py todo.py complete 349cef9e-bc25-4a16-9d62-ba31317ff8cb
-
-Marked complete: Buy groceries
-
-
+$ py todo.py complete 1
+Marked complete: Fix critical bug
 
 $ py todo.py list
 
-\[349cef9e-bc25-4a16-9d62-ba31317ff8cb] ~~Buy groceries~~
+--- Urgent (Not Important) ---
+[2] Email boss
 
-\[b0e6272d-0d9c-432a-88aa-ac277b511308] Write report
-
+--- Important & Urgent ---
+[1] ~~Fix critical bug~~
 ```
 
-
-
-\## Project Structure
+## Project Structure
 
 ```
-
 ├── todo.py           # Main CLI interface
-
 ├── task.py           # Task data model
-
 ├── storage.py        # JSON persistence layer
-
-├── week\_utils.py     # Week boundary calculations
-
-└── .planning/        # GSD development artifacts
-
-&nbsp;   ├── PROJECT.md
-
-&nbsp;   ├── MILESTONES.md
-
-&nbsp;   └── milestones/
-
+└── week_utils.py     # Week boundary calculations
 ```
 
+## Technical Details
 
+- **Language**: Python 3.x
+- **Dependencies**: None (stdlib only)
+- **Storage**: JSON file (`tasks.json`)
+- **Key Concepts**: Eisenhower Matrix, Week-based partitioning
 
-\## Development Methodology
-
-
-
-Built using \[Get-Shit-Done (GSD)](https://github.com/glittercowboy/get-shit-done) workflow system:
-
-\- Spec-driven development
-
-\- Phase-based execution
-
-\- Atomic git commits
-
-\- AI-assisted code generation
-
-
-
-\*\*Stats:\*\*
-
-\- 616 lines of Python
-
-\- 15 requirements validated
-
-\- 2 phases, 3 plans, 7 tasks
-
-\- Built in 1 day
-
-\- v1.0 shipped
-
-
-
-\## Technical Details
-
-
-
-\- \*\*Language\*\*: Python 3.x
-
-\- \*\*Dependencies\*\*: None (stdlib only)
-
-\- \*\*Storage\*\*: JSON file (`tasks.json`)
-
-\- \*\*Architecture\*\*: Modular (task model, storage, utilities, CLI)
-
-
-
-\## Built With
-
-
-
-\- \[Claude Code](https://claude.ai/code) - AI coding assistant
-
-\- \[GSD](https://github.com/glittercowboy/get-shit-done) - Meta-prompting workflow system
-
-\- Python standard library
-
-
-
-\## License
-
-
+## License
 
 MIT
-
-
-
-\## Acknowledgments
-
-
-
-Built as part of a 12-week AI agent development learning journey.
-
