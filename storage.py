@@ -107,4 +107,4 @@ class TaskStore:
             int: Number of tasks
         """
         tasks = self.get_tasks_for_week(week_start)
-        return sum(1 for t in tasks if t.category == category)
+        return sum(1 for t in tasks if t.category == category and not t.completed)
