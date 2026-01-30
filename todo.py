@@ -11,10 +11,11 @@ PRIORITY_MAP = {
     CAT_IMPORTANT: 3
 }
 
+
 DISPLAY_NAMES = {
-    CAT_IMPORTANT_URGENT: "Important & Urgent",
-    CAT_URGENT: "Urgent (Not Important)",
-    CAT_IMPORTANT: "Important (Not Urgent)"
+    CAT_IMPORTANT_URGENT: "Important & Urgent (Priority 1)",
+    CAT_URGENT: "Urgent (Priority 2)",
+    CAT_IMPORTANT: "Important (Priority 3)"
 }
 
 def add_task(args, store):
