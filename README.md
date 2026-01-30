@@ -4,13 +4,14 @@ A week-based command-line TODO list manager built using AI Agent-assisted develo
 
 ## Features
 
+- 📅 **Date & Day Display**: Shows current date and day of week (e.g., `📅 01:30:2026 Friday`)
 - 📅 **Week-based organization**: Tasks automatically organized by Monday-Sunday weeks
 - 🧠 **Eisenhower Matrix**: Categorize tasks by Priority:
     - **Important & Urgent** (Priority 1)
     - **Urgent** (Priority 2)
     - **Important** (Priority 3)
 - 🔢 **Simple IDs**: Easy-to-type integer IDs (1, 2, 3...)
-- 🚫 **Task Limits**: Strict limit of **3 tasks** per category to enforce focus
+- 🚫 **Task Limits**: Strict limit of **3 active tasks** per category to enforce focus (completed tasks don't count!)
 - ⚡ **Bulk Actions**: Complete or delete all tasks for the week in one command
 - 💾 **Zero dependencies**: Pure Python standard library
 - 💾 **JSON persistence**: Tasks saved to local file (`tasks.json`)
@@ -63,17 +64,19 @@ py todo.py --help
 
 ```bash
 $ py todo.py add "Fix critical bug" -c important_urgent
-Added task: Fix critical bug (ID: 1) -> Important & Urgent
+Added task: Fix critical bug (ID: 1) -> Important & Urgent (Priority 1)
 
 $ py todo.py add "Email boss" -c urgent
-Added task: Email boss (ID: 2) -> Urgent (Not Important)
+Added task: Email boss (ID: 2) -> Urgent (Priority 2)
 
 $ py todo.py list
 
---- Important & Urgent ---
+📅 01:30:2026 Friday
+
+--- Important & Urgent (Priority 1) ---
 [1] Fix critical bug
 
---- Urgent (Not Important) ---
+--- Urgent (Priority 2) ---
 [2] Email boss
 
 $ py todo.py complete 1
@@ -81,10 +84,12 @@ Marked complete: Fix critical bug
 
 $ py todo.py list
 
---- Urgent (Not Important) ---
+📅 01:30:2026 Friday
+
+--- Urgent (Priority 2) ---
 [2] Email boss
 
---- Important & Urgent ---
+--- Important & Urgent (Priority 1) ---
 [1] ~~Fix critical bug~~
 ```
 
