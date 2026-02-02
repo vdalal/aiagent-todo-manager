@@ -1,113 +1,80 @@
 # AI Agent TODO Manager
 
-A week-based command-line TODO list manager built using AI Agent-assisted development. Now features the **Eisenhower Matrix** for productivity!
+A week-based task manager featuring the **Eisenhower Matrix** and a modern Web GUI. Built with Python, FastAPI, and vanilla HTML/CSS.
 
 ## Features
 
-- 📅 **Date & Day Display**: Shows current date and day of week (e.g., `📅 01:30:2026 Friday`)
-- 📅 **Week-based organization**: Tasks automatically organized by Monday-Sunday weeks
-- 🧠 **Eisenhower Matrix**: Categorize tasks by Priority:
-    - **Important & Urgent** (Priority 1)
-    - **Urgent** (Priority 2)
-    - **Important** (Priority 3)
-- 🔢 **Simple IDs**: Easy-to-type integer IDs (1, 2, 3...)
-- 🚫 **Task Limits**: Strict limit of **3 active tasks** per category to enforce focus (completed tasks don't count!)
-- ⚡ **Bulk Actions**: Complete or delete all tasks for the week in one command
-- 💾 **Zero dependencies**: Pure Python standard library
-- 💾 **JSON persistence**: Tasks saved to local file (`tasks.json`)
+### 🖥️ Modern Web GUI
+- **Visual Dashboard**: Dark-themed, glassmorphism-inspired interface.
+- **Eisenhower Matrix**: Tasks automatically sorted into quadrants:
+    - **Do First** (Important & Urgent)
+    - **Schedule** (Urgent)
+    - **Delegate / Later** (Important)
+- **Parking Lot**: A 4th column for tasks that don't fit elsewhere, with a dedicated limit of **5 tasks**.
+- **Task Limits**: Strict limit of **3 active tasks** for standard categories to enforce focus.
+- **Interactive**: 
+    - Toggle completion with a click.
+    - Rename column headers (e.g., "Do First" -> "Critical") just by clicking them.
+    - Delete tasks instantly.
+- **Bulk Actions**: Buttons to "Complete Week" or "Delete Week" in one go.
+
+### ⚙️ Core Features
+- **Week-based organization**: Tasks automatically partitioned by week.
+- **Persistence**: Data saved to `tasks.json`.
+- **Zero-Refresh**: Tasks add/delete instantly without full page reloads.
 
 ## Installation
 
-```bash
-git clone https://github.com/vdalal/aiagent-todo-manager.git
-cd aiagent-todo-manager
-```
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/vdalal/aiagent-todo-manager.git
+    cd aiagent-todo-manager
+    ```
 
-No dependencies to install - pure Python!
+2.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ## Usage
 
-```bash
-# Add a task (Default category: Important & Urgent)
-py todo.py add "Fix server"
-
-# Add a task to specific category
-py todo.py add "Buy milk" -c urgent
-py todo.py add "Learn Python" -c important
-
-# List all tasks (Sorted by Priority: Imp+Urg -> Urgent -> Imp)
-py todo.py list
-
-# Complete a task
-py todo.py complete <id>
-
-# Delete a task
-py todo.py delete <id>
-
-# BULK ACTIONS
-# Complete ALL tasks for the current week
-py todo.py complete-all
-
-# Delete ALL tasks for the current week
-py todo.py delete-all
-
-# Show help
-py todo.py --help
-```
-
-### Valid Categories
-- `important_urgent` (Default)
-- `urgent`
-- `important`
-
-## Example
+Start the web server:
 
 ```bash
-$ py todo.py add "Fix critical bug" -c important_urgent
-Added task: Fix critical bug (ID: 1) -> Important & Urgent (Priority 1)
-
-$ py todo.py add "Email boss" -c urgent
-Added task: Email boss (ID: 2) -> Urgent (Priority 2)
-
-$ py todo.py list
-
-📅 01:30:2026 Friday
-
---- Important & Urgent (Priority 1) ---
-[1] Fix critical bug
-
---- Urgent (Priority 2) ---
-[2] Email boss
-
-$ py todo.py complete 1
-Marked complete: Fix critical bug
-
-$ py todo.py list
-
-📅 01:30:2026 Friday
-
---- Urgent (Priority 2) ---
-[2] Email boss
-
---- Important & Urgent (Priority 1) ---
-[1] ~~Fix critical bug~~
+py -m uvicorn webapp:app --reload
 ```
+
+Open your browser to: **[http://127.0.0.1:8000](http://127.0.0.1:8000)**
+
+## Categories & Limits
+
+| Category | UI Name | Active Limit |
+| :--- | :--- | :--- |
+| `important_urgent` | Do First | 3 |
+| `urgent` | Schedule | 3 |
+| `important` | Delegate | 3 |
+| `parking_lot` | Parking Lot | **5** |
+
+*Note: Completed tasks do not count towards the active limit.*
 
 ## Project Structure
 
 ```
-├── todo.py           # Main CLI interface
-├── task.py           # Task data model
-├── storage.py        # JSON persistence layer
-└── week_utils.py     # Week boundary calculations
+├── webapp.py           # FastAPI backend
+├── templates/
+│   └── index.html      # Frontend HTML
+├── static/
+│   └── style.css       # CSS Styling
+├── todo.py             # (Legacy) CLI interface
+├── task.py             # Task data model
+└── storage.py          # JSON persistence layer
 ```
 
 ## Technical Details
 
-- **Language**: Python 3.x
-- **Dependencies**: None (stdlib only)
+- **Backend**: Python 3.x, FastAPI
+- **Frontend**: HTML5, CSS3 (Grid/Flexbox), Vanilla JS
 - **Storage**: JSON file (`tasks.json`)
-- **Key Concepts**: Eisenhower Matrix, Week-based partitioning
 
 ## License
 
