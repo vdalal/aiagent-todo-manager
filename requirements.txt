@@ -1,0 +1,5 @@
+textual>=0.47.1
+fastapi
+uvicorn
+jinja2
+python-multipart

@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisenhower Matrix</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css?v=1.2">
+    <style>
+        .header-editable {
+            cursor: text;
+            border-bottom: 1px dashed transparent;
+            transition: border-color 0.2s;
+        }
+
+        .header-editable:hover,
+        .header-editable:focus {
+            border-bottom-color: var(--text-secondary);
+            outline: none;
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn-text {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .btn-text:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .btn-danger:hover {
+            color: var(--accent-danger);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <header>
+            <h1>Eisenhower Matrix</h1>
+            <p id="current-date">Loading date...</p>
+        </header>
+
+        <div class="add-task-container">
+            <form id="add-task-form">
+                <input type="text" id="task-input" placeholder="What needs to be done?" required autocomplete="off">
+                <select id="category-select">
+                    <option value="important_urgent">Important & Urgent</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="important">Important</option>
+                    <option value="parking_lot">Parking Lot</option>
+                </select>
+                <button type="submit">Add Task</button>
+            </form>
+        </div>
+
+        <div class="matrix-grid">
+            <!-- Quadrant 1 -->
+            <div class="quadrant q1">
+                <div class="quadrant-header">
+                    <h2 contenteditable="true" id="header-q1" class="header-editable">Do First</h2>
+                    <span class="badge">Priority 1</span>
+                </div>
+                <div class="task-list" id="list-important_urgent"></div>
+            </div>
+
+            <!-- Quadrant 2 -->
+            <div class="quadrant q2">
+                <div class="quadrant-header">
+                    <h2 contenteditable="true" id="header-q2" class="header-editable">Schedule</h2>
+                    <span class="badge">Priority 2</span>
+                </div>
+                <div class="task-list" id="list-urgent"></div>
+            </div>
+
+            <!-- Quadrant 3 -->
+            <div class="quadrant q3">
+                <div class="quadrant-header">
+                    <h2 contenteditable="true" id="header-q3" class="header-editable">Delegate / Later</h2>
+                    <span class="badge">Priority 3</span>
+                </div>
+                <div class="task-list" id="list-important"></div>
+            </div>
+
+            <!-- Quadrant 4 (Parking Lot) -->
+            <div class="quadrant q4">
+                <div class="quadrant-header">
+                    <h2 contenteditable="true" id="header-q4" class="header-editable">Parking Lot</h2>
+                    <span class="badge">Max 5</span>
+                </div>
+                <div class="task-list" id="list-parking_lot"></div>
+            </div>
+        </div>
+
+        <div class="controls-row">
+            <button class="btn-text" onclick="completeAll()">✓ Complete Week</button>
+            <button class="btn-text btn-danger" onclick="deleteAll()">🗑 Delete Week</button>
+        </div>
+
+        <footer>
+            <p>v1.1</p>
+        </footer>
+    </div>
+
+    <script>
+        const API_URL = '/api/tasks';
+
+        // --- Date Logic ---
+        function updateDate() {
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const now = new Date();
+            // Just for fun/detail, let's include time if user wants "Refresh" to mean "Update Time" too
+            // But requirement said "Refresh Date... after adding/deleting". 
+            // Usually date doesn't change that fast, but maybe they cross midnight?
+            document.getElementById('current-date').innerText = now.toLocaleDateString('en-US', dateOptions);
+        }
+
+        // --- Editable Headers Logic ---
+        function setupHeaders() {
+            ['q1', 'q2', 'q3', 'q4'].forEach(id => {
+                const el = document.getElementById(`header-${id}`);
+                const saved = localStorage.getItem(`header-${id}`);
+                if (saved) el.innerText = saved;
+
+                el.addEventListener('blur', () => {
+                    localStorage.setItem(`header-${id}`, el.innerText);
+                });
+
+                // Prevent newlines
+                el.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        el.blur();
+                    }
+                });
+            });
+        }
+
+        // --- Core Logic ---
+
+        async function fetchTasks() {
+            try {
+                const response = await fetch(API_URL);
+                const tasks = await response.json();
+                renderTasks(tasks);
+                updateDate(); // Refresh date on every fetch
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+
+        function renderTasks(tasks) {
+            ['important_urgent', 'urgent', 'important', 'parking_lot'].forEach(cat => {
+                document.getElementById(`list-${cat}`).innerHTML = '';
+            });
+
+            tasks.forEach(task => {
+                const listId = `list-${task.category}`;
+                const container = document.getElementById(listId);
+                if (container) {
+                    container.appendChild(createTaskElement(task));
+                }
+            });
+        }
+
+        function createTaskElement(task) {
+            const div = document.createElement('div');
+            div.className = `task-card ${task.completed ? 'completed' : ''}`;
+
+            div.innerHTML = `
+                <div class="task-content" onclick="toggleTask(${task.id})">
+                    <div class="checkbox"></div>
+                    <span class="task-text">${task.text}</span>
+                </div>
+                <button class="delete-btn" onclick="deleteTask(${task.id}, event)">×</button>
+            `;
+            return div;
+        }
+
+        async function toggleTask(id) {
+            try {
+                await fetch(`${API_URL}/${id}/toggle`, { method: 'POST' });
+                fetchTasks();
+            } catch (error) {
+                console.error('Error toggling task:', error);
+            }
+        }
+
+        async function deleteTask(id, event) {
+            event.stopPropagation();
+            if (!confirm('Delete this task?')) return;
+            try {
+                await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+                fetchTasks();
+            } catch (error) {
+                console.error('Error deleting task:', error);
+            }
+        }
+
+        async function completeAll() {
+            if (!confirm('Mark ALL visible tasks as complete?')) return;
+            try {
+                await fetch(`${API_URL}/complete-all`, { method: 'POST' });
+                fetchTasks();
+            } catch (error) {
+                console.error('Error completing all:', error);
+            }
+        }
+
+        async function deleteAll() {
+            if (!confirm('DELETE ALL visible tasks? This cannot be undone.')) return;
+            try {
+                await fetch(`${API_URL}/delete-all`, { method: 'DELETE' });
+                fetchTasks();
+            } catch (error) {
+                console.error('Error deleting all:', error);
+            }
+        }
+
+        // --- Init ---
+        document.getElementById('add-task-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const textInput = document.getElementById('task-input');
+            const catSelect = document.getElementById('category-select');
+
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text, category: catSelect.value })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    alert(err.detail);
+                } else {
+                    textInput.value = '';
+                    fetchTasks();
+                }
+            } catch (error) {
+                console.error('Error adding task:', error);
+            }
+        });
+
+        // Start
+        setupHeaders();
+        fetchTasks();
+        updateDate();
+    </script>
+</body>
+
+</html>

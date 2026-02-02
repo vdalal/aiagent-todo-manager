@@ -10,8 +10,9 @@ from week_utils import get_week_start
 CAT_IMPORTANT_URGENT = 'important_urgent'
 CAT_URGENT = 'urgent'
 CAT_IMPORTANT = 'important'
+CAT_PARKING_LOT = 'parking_lot'
 
-VALID_CATEGORIES = [CAT_IMPORTANT_URGENT, CAT_URGENT, CAT_IMPORTANT]
+VALID_CATEGORIES = [CAT_IMPORTANT_URGENT, CAT_URGENT, CAT_IMPORTANT, CAT_PARKING_LOT]
 
 class Task:
     """Represents a single task with integer ID and Eisenhover category.
