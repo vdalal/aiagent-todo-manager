@@ -1,4 +1,5 @@
 # AI Agent TODO Manager
+![Version](https://img.shields.io/badge/version-0.0.2-blue)
 
 A week-based task manager featuring the **Eisenhower Matrix** and a modern Web GUI. Built with Python, FastAPI, and vanilla HTML/CSS.
 
@@ -12,10 +13,11 @@ A week-based task manager featuring the **Eisenhower Matrix** and a modern Web G
     - **Delegate / Later** (Important)
 - **Parking Lot**: A 4th column for tasks that don't fit elsewhere, with a dedicated limit of **5 tasks**.
 - **Task Limits**: Strict limit of **3 active tasks** for standard categories to enforce focus.
-- **Interactive**: 
-    - Toggle completion with a click.
-    - Rename column headers (e.g., "Do First" -> "Critical") just by clicking them.
-    - Delete tasks instantly.
+- **Interactive**:
+    - **Direct Add**: Click the `+` button in any column header to add tasks instantly.
+    - **Drag and Drop**: Move tasks between columns effortlessly; validation prevents overfilling categories.
+    - **Inline Editing**: Double-click any task to edit its text.
+    - **Quick Actions**: Toggle completion with a click, delete instantly.
 - **Bulk Actions**: Buttons to "Complete Week" or "Delete Week" in one go.
 
 ### ⚙️ Core Features
