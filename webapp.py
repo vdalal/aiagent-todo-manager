@@ -78,6 +78,52 @@ async def toggle_task(task_id: int):
     store.save_tasks(tasks)
     return task.to_dict()
 
+class TaskUpdate(BaseModel):
+    text: Optional[str] = None
+    category: Optional[str] = None
+
+@app.put("/api/tasks/{task_id}")
+async def update_task(task_id: int, task_data: TaskUpdate):
+    week_start = get_week_start()
+    tasks = store.load_tasks()
+    task = next((t for t in tasks if t.id == task_id), None)
+    
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+        
+    # Update text if provided
+    if task_data.text is not None:
+        task.text = task_data.text
+        
+    # Update category if provided
+    if task_data.category is not None and task_data.category != task.category:
+        if task_data.category not in VALID_CATEGORIES:
+             raise HTTPException(status_code=400, detail="Invalid category")
+
+        # Check limits if moving to a restricted category
+        # Count tasks in target category (excluding the current task if it was already there, which it isn't)
+        # We need to count tasks in the *target* category for the *current* week
+        # But `store.get_task_count_by_category` loads from file. 
+        # We should calculate from our loaded `tasks` list to be safe and atomic-ish?
+        # Actually `store` methods read the file.
+        # Let's count manually from our `tasks` list which is the current state + modification
+        
+        target_cat_count = sum(1 for t in tasks 
+                               if t.week_start == week_start 
+                               and t.category == task_data.category 
+                               and not t.completed)
+                               
+        limit = 5 if task_data.category == CAT_PARKING_LOT else 3
+        
+        # If the task is being moved *into* this category, checks apply
+        if target_cat_count >= limit:
+             raise HTTPException(status_code=400, detail=f"Target category is full ({target_cat_count}/{limit}).")
+             
+        task.category = task_data.category
+        
+    store.save_tasks(tasks)
+    return task.to_dict()
+
 @app.delete("/api/tasks/delete-all")
 async def delete_all_tasks():
     week_start = get_week_start()

@@ -1,39 +1,45 @@
-# Implementation Plan: TUI for Todo Manager
+# Implementation Plan: Web UI Enhancements
 
 ## Goal Description
-Create an interactive Terminal User Interface (TUI) using the `textual` library to provide an "always-on" application experience. This will run alongside the existing CLI, sharing the same data.
+Enhance the Web GUI with:
+1.  **Task Text Editing** (Completed)
+2.  **Drag-and-Drop** (Completed)
+3.  **Direct Task Addition**: Allow users to add tasks directly to a specific category via a "+" button in the quadrant header.
+4.  **UI Cleanup**: Remove the redundant top "Add Task" bar.
 
 ## User Review Required
-None.
+> [!NOTE]
+> Selected Option 1: Header "+" Button.
 
 ## Proposed Changes
 
-### Dependencies
-#### [NEW] [requirements.txt](file:///C:/Users/vdala/OneDrive/Antigravity/aiagent-todo-manager/requirements.txt)
--   Add `textual>=0.47.1`
+### Frontend
+#### [MODIFY] [templates/index.html](file:///C:/Users/vdala/OneDrive/Antigravity/aiagent-todo-manager/templates/index.html)
+-   **Add Task Button**:
+    -   Add a small `+` button to each `.quadrant-header`.
+    -   On click, insert a temporary input field at the *top* of the corresponding `.task-list`.
+    -   On `Enter` in that input:
+        -   Call `POST /api/tasks` with the specific category.
+        -   Remove input and prepend the new task card.
+    -   On `Blur` or `Escape`: remove the input without saving.
+-   **Remove Top Bar**:
+    -   Remove the `.add-task-container` form from `index.html`.
+    -   Remove/Clean up associated CSS in `style.css`.
+    -   Remove associated JS event listener in `index.html`.
 
-### Application Logic
-#### [NEW] [tui.py](file:///C:/Users/vdala/OneDrive/Antigravity/aiagent-todo-manager/tui.py)
-This will be the main entry point for the TUI application.
--   **App Class**: `TodoApp(App)`
--   **Layout**:
-    -   **Header**: App Title + Current Date
-    -   **Main**: Vertical scrollable container.
-    -   **Task Lists**: Three `Collapsible` or `Static` widgets, one for each Eisenhower category.
-    -   **Input**: A `Input` widget at the bottom for adding tasks quickly.
-    -   **Footer**: Key bindings help (`q`: Quit, `n`: New, `Space`: Complete).
--   **Interactivity**:
-    -   Click to toggle completion status.
-    -   Auto-refresh on adding tasks.
-
-#### [MODIFY] [storage.py](file:///C:/Users/vdala/OneDrive/Antigravity/aiagent-todo-manager/storage.py)
--   No major changes expected, but we need to ensure verify methods are robust for rapid reloading.
+#### [MODIFY] [static/style.css](file:///C:/Users/vdala/OneDrive/Antigravity/aiagent-todo-manager/static/style.css)
+-   Style the `.add-btn` in the header (subtle, consistent with existing buttons).
+-   Style the temporary input field to look like a task card being created.
 
 ## Verification Plan
 
 ### Manual Verification
--   **Launch**: Run `python tui.py` and ensure it renders.
--   **Add Task**: Type in input box, press Enter, verify it appears in correct category.
--   **View**: Verify headers show correct counts and priorities.
--   **Interaction**: Click a task to complete it.
--   **Cross-Check**: Open a separate terminal, run `py todo.py list`, and verify data matches.
+1.  **Direct Add**:
+    -   Click "+" in "Do First".
+    -   Type "New Urgent Task" and hit Enter.
+    -   Verify it appears at the top of "Do First".
+    -   Verify it persists after reload.
+2.  **Cancel Add**:
+    -   Click "+".
+    -   Press Escape or click away.
+    -   Verify no task is created.

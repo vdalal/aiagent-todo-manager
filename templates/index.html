@@ -58,25 +58,17 @@
             <p id="current-date">Loading date...</p>
         </header>
 
-        <div class="add-task-container">
-            <form id="add-task-form">
-                <input type="text" id="task-input" placeholder="What needs to be done?" required autocomplete="off">
-                <select id="category-select">
-                    <option value="important_urgent">Important & Urgent</option>
-                    <option value="urgent">Urgent</option>
-                    <option value="important">Important</option>
-                    <option value="parking_lot">Parking Lot</option>
-                </select>
-                <button type="submit">Add Task</button>
-            </form>
-        </div>
+
 
         <div class="matrix-grid">
             <!-- Quadrant 1 -->
             <div class="quadrant q1">
                 <div class="quadrant-header">
                     <h2 contenteditable="true" id="header-q1" class="header-editable">Do First</h2>
-                    <span class="badge">Priority 1</span>
+                    <div class="header-controls">
+                        <span class="badge">Priority 1</span>
+                        <button class="add-btn" onclick="showAddInput('important_urgent')">+</button>
+                    </div>
                 </div>
                 <div class="task-list" id="list-important_urgent"></div>
             </div>
@@ -85,7 +77,10 @@
             <div class="quadrant q2">
                 <div class="quadrant-header">
                     <h2 contenteditable="true" id="header-q2" class="header-editable">Schedule</h2>
-                    <span class="badge">Priority 2</span>
+                    <div class="header-controls">
+                        <span class="badge">Priority 2</span>
+                        <button class="add-btn" onclick="showAddInput('urgent')">+</button>
+                    </div>
                 </div>
                 <div class="task-list" id="list-urgent"></div>
             </div>
@@ -94,7 +89,10 @@
             <div class="quadrant q3">
                 <div class="quadrant-header">
                     <h2 contenteditable="true" id="header-q3" class="header-editable">Delegate / Later</h2>
-                    <span class="badge">Priority 3</span>
+                    <div class="header-controls">
+                        <span class="badge">Priority 3</span>
+                        <button class="add-btn" onclick="showAddInput('important')">+</button>
+                    </div>
                 </div>
                 <div class="task-list" id="list-important"></div>
             </div>
@@ -103,7 +101,10 @@
             <div class="quadrant q4">
                 <div class="quadrant-header">
                     <h2 contenteditable="true" id="header-q4" class="header-editable">Parking Lot</h2>
-                    <span class="badge">Max 5</span>
+                    <div class="header-controls">
+                        <span class="badge">Max 5</span>
+                        <button class="add-btn" onclick="showAddInput('parking_lot')">+</button>
+                    </div>
                 </div>
                 <div class="task-list" id="list-parking_lot"></div>
             </div>
@@ -115,7 +116,7 @@
         </div>
 
         <footer>
-            <p>v1.1</p>
+            <p>v0.0.2</p>
         </footer>
     </div>
 
@@ -153,6 +154,194 @@
             });
         }
 
+        // --- Drag and Drop Logic ---
+        let draggedItem = null;
+
+        function handleDragStart(e, task) {
+            draggedItem = task;
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', JSON.stringify(task));
+            e.target.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedItem = null;
+
+            // Remove drop targets highlighting
+            document.querySelectorAll('.quadrant').forEach(q => {
+                q.classList.remove('drag-over');
+            });
+        }
+
+        function setupDragDrop() {
+            const quadrants = document.querySelectorAll('.quadrant');
+
+            quadrants.forEach(quadrant => {
+                quadrant.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Necessary to allow dropping
+                    e.dataTransfer.dropEffect = 'move';
+                    quadrant.classList.add('drag-over');
+                });
+
+                quadrant.addEventListener('dragleave', (e) => {
+                    quadrant.classList.remove('drag-over');
+                });
+
+                quadrant.addEventListener('drop', async (e) => {
+                    e.preventDefault();
+                    quadrant.classList.remove('drag-over');
+
+                    if (!draggedItem) return;
+
+                    // Determine target category based on the list ID inside the quadrant
+                    const listDiv = quadrant.querySelector('.task-list');
+                    if (!listDiv) return;
+
+                    const targetCategory = listDiv.id.replace('list-', '');
+
+                    if (draggedItem.category === targetCategory) return; // No change
+
+                    // Call API to move
+                    try {
+                        const response = await fetch(`${API_URL}/${draggedItem.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ category: targetCategory })
+                        });
+
+                        if (!response.ok) {
+                            const err = await response.json();
+                            alert(err.detail); // Show limit error etc
+                        } else {
+                            fetchTasks(); // Refresh UI
+                        }
+                    } catch (error) {
+                        console.error('Error moving task:', error);
+                        alert('Failed to move task');
+                    }
+                });
+            });
+        }
+
+        // --- Text Editing Logic ---
+        function makeEditable(element, task) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = task.text;
+            input.className = 'edit-task-input';
+
+            async function save() {
+                const newText = input.value.trim();
+                if (newText && newText !== task.text) {
+                    try {
+                        await fetch(`${API_URL}/${task.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: newText })
+                        });
+                        fetchTasks();
+                    } catch (error) {
+                        console.error('Error updating text:', error);
+                        element.innerText = task.text; // Revert on error
+                    }
+                } else {
+                    element.innerText = task.text; // Revert if empty or same
+                }
+                // Replace input with original span (content will be updated by fetchTasks, but for immediate feel)
+                if (element.parentNode) {
+                    element.parentNode.replaceChild(element, input);
+                    // The fetchTasks will overwrite this anyway, but if it fails we are safe
+                }
+            }
+
+            input.addEventListener('blur', save);
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    input.blur();
+                }
+            });
+
+            element.parentNode.replaceChild(input, element);
+            input.focus();
+        }
+
+        // --- Direct Add Logic ---
+        function showAddInput(category) {
+            const listId = `list-${category}`;
+            const listContainer = document.getElementById(listId);
+            if (!listContainer) return;
+
+            // Check if already adding
+            if (listContainer.querySelector('.temp-input-container')) return;
+
+            const div = document.createElement('div');
+            div.className = 'task-card temp-input-container';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.placeholder = 'New task...';
+            input.className = 'temp-input';
+
+            div.appendChild(input);
+
+            // Insert at top
+            listContainer.insertBefore(div, listContainer.firstChild);
+            input.focus();
+
+            async function save() {
+                const text = input.value.trim();
+                if (text) {
+                    try {
+                        const response = await fetch(API_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text, category })
+                        });
+
+                        if (!response.ok) {
+                            const err = await response.json();
+                            alert(err.detail); // Show limit error
+                            removeInput();
+                        } else {
+                            fetchTasks(); // Refresh to show new task properly sorted/rendered
+                        }
+                    } catch (error) {
+                        console.error('Error adding task:', error);
+                        alert('Failed to add task');
+                        removeInput();
+                    }
+                } else {
+                    removeInput();
+                }
+            }
+
+            function removeInput() {
+                if (div.parentNode) div.parentNode.removeChild(div);
+            }
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    save();
+                } else if (e.key === 'Escape') {
+                    removeInput();
+                }
+            });
+
+            input.addEventListener('blur', () => {
+                // Delay slightly to allow click events (like if they clicked a button)? 
+                // Actually usually better to save on blur for "click away to save" 
+                // OR cancel on blur. The requirement didn't specify, but "Cancel Add" verification step says "click away".
+                // So let's cancel on blur if empty, or save? 
+                // Standard behavior for "Add Item" is often "Click away = Cancel" or "Click away = Save".
+                // Let's go with Cancel on blur per the "Cancel Add" plan test case "Press Escape or click away. Verify no task created".
+                // Wait, actually, if I type something and click away, usually I expect it to save?
+                // But the plan "Cancel Add" implied "click away... verify no task created". 
+                // Let's assume click away cancels.
+                removeInput();
+            });
+        }
+
         // --- Core Logic ---
 
         async function fetchTasks() {
@@ -168,7 +357,8 @@
 
         function renderTasks(tasks) {
             ['important_urgent', 'urgent', 'important', 'parking_lot'].forEach(cat => {
-                document.getElementById(`list-${cat}`).innerHTML = '';
+                const el = document.getElementById(`list-${cat}`);
+                if (el) el.innerHTML = '';
             });
 
             tasks.forEach(task => {
@@ -184,13 +374,20 @@
             const div = document.createElement('div');
             div.className = `task-card ${task.completed ? 'completed' : ''}`;
 
+            // Drag attributes
+            div.draggable = true;
+            div.addEventListener('dragstart', (e) => handleDragStart(e, task));
+            div.addEventListener('dragend', handleDragEnd);
+
             div.innerHTML = `
-                <div class="task-content" onclick="toggleTask(${task.id})">
-                    <div class="checkbox"></div>
-                    <span class="task-text">${task.text}</span>
+                <div class="task-content">
+                    <div class="checkbox" onclick="toggleTask(${task.id})"></div>
+                    <span class="task-text" ondblclick="event.stopPropagation(); makeEditable(this, ${JSON.stringify(task).replace(/"/g, '&quot;')})">${task.text}</span>
                 </div>
                 <button class="delete-btn" onclick="deleteTask(${task.id}, event)">×</button>
             `;
+            // Note: onclick moved to checkbox to avoid triggering when editing text
+
             return div;
         }
 
@@ -235,35 +432,11 @@
         }
 
         // --- Init ---
-        document.getElementById('add-task-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const textInput = document.getElementById('task-input');
-            const catSelect = document.getElementById('category-select');
 
-            const text = textInput.value.trim();
-            if (!text) return;
-
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text, category: catSelect.value })
-                });
-
-                if (!response.ok) {
-                    const err = await response.json();
-                    alert(err.detail);
-                } else {
-                    textInput.value = '';
-                    fetchTasks();
-                }
-            } catch (error) {
-                console.error('Error adding task:', error);
-            }
-        });
 
         // Start
         setupHeaders();
+        setupDragDrop();
         fetchTasks();
         updateDate();
     </script>
